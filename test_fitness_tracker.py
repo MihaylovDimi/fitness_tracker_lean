@@ -7,7 +7,7 @@ from tracker import FitnessTracker
 
 class FitnessTrackerTest(unittest.TestCase):
     def setUp(self):
-        self.tracker = FitnessTracker(db_path=":memory:")
+        self.tracker = FitnessTracker()
 
     def test_log_run_records_distance_and_time(self):
         self.tracker.log_run(distance_in_km=5, elapsed_time_minutes=30)
