@@ -1,11 +1,6 @@
 """FitnessTracker MVP (simulated starting point before the Lean waste audit)."""
 
-import json
 import sqlite3
-import urllib.request
-
-WEATHER_URL = "https://api.example.com/weather?city=Cambridge"
-SOCIAL_URL = "https://api.example.com/social/post"
 
 RUNNING_MET = 9.8
 WALKING_MET = 3.5
@@ -25,11 +20,7 @@ class FitnessTracker:
             "distance_in_km": distance_in_km,
             "elapsed_time_minutes": elapsed_time_minutes,
         }
-        with urllib.request.urlopen(WEATHER_URL) as response:
-            run_record["weather"] = json.load(response)
         self.runs.append(run_record)
-        post = json.dumps({"text": f"I just ran {distance_in_km} km!"}).encode()
-        urllib.request.urlopen(SOCIAL_URL, data=post)
 
     def calories_running(self, weight_in_kg, elapsed_time_minutes):
         return self._calculate_calories(RUNNING_MET, weight_in_kg, elapsed_time_minutes)

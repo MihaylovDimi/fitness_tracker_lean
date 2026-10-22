@@ -9,6 +9,13 @@ class FitnessTrackerTest(unittest.TestCase):
     def setUp(self):
         self.tracker = FitnessTracker(db_path=":memory:")
 
+    def test_log_run_records_distance_and_time(self):
+        self.tracker.log_run(distance_in_km=5, elapsed_time_minutes=30)
+
+        self.assertEqual(
+            self.tracker.runs, [{"distance_in_km": 5, "elapsed_time_minutes": 30}]
+        )
+
     def test_calories_use_the_met_value_of_each_activity(self):
         self.assertEqual(self.tracker.calories_running(70, 30), 343.0)
         self.assertEqual(self.tracker.calories_walking(70, 30), 122.5)
