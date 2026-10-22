@@ -7,6 +7,10 @@ import urllib.request
 WEATHER_URL = "https://api.example.com/weather?city=Cambridge"
 SOCIAL_URL = "https://api.example.com/social/post"
 
+RUNNING_MET = 9.8
+WALKING_MET = 3.5
+CYCLING_MET = 7.5
+
 
 class FitnessTracker:
     def __init__(self, db_path="fitness.db"):
@@ -16,26 +20,29 @@ class FitnessTracker:
         self.db.execute("CREATE TABLE IF NOT EXISTS goals (id INTEGER PRIMARY KEY, type_id INTEGER, week TEXT, target REAL)")
         self.db.execute("CREATE TABLE IF NOT EXISTS goal_history (id INTEGER PRIMARY KEY, goal_id INTEGER, changed_at TEXT)")
 
-    def log_run(self, x, temp):
-        data1 = {"distance_in_km": x, "elapsed_time_minutes": temp}
+    def log_run(self, distance_in_km, elapsed_time_minutes):
+        run_record = {
+            "distance_in_km": distance_in_km,
+            "elapsed_time_minutes": elapsed_time_minutes,
+        }
         with urllib.request.urlopen(WEATHER_URL) as response:
-            data1["weather"] = json.load(response)
-        self.runs.append(data1)
-        post = json.dumps({"text": f"I just ran {x} km!"}).encode()
+            run_record["weather"] = json.load(response)
+        self.runs.append(run_record)
+        post = json.dumps({"text": f"I just ran {distance_in_km} km!"}).encode()
         urllib.request.urlopen(SOCIAL_URL, data=post)
 
-    def calories_running(self, weight, minutes):
-        return self._calculate_calories(9.8, weight, minutes)
+    def calories_running(self, weight_in_kg, elapsed_time_minutes):
+        return self._calculate_calories(RUNNING_MET, weight_in_kg, elapsed_time_minutes)
 
-    def calories_walking(self, weight, minutes):
-        return self._calculate_calories(3.5, weight, minutes)
+    def calories_walking(self, weight_in_kg, elapsed_time_minutes):
+        return self._calculate_calories(WALKING_MET, weight_in_kg, elapsed_time_minutes)
 
-    def calories_cycling(self, weight, minutes):
-        return self._calculate_calories(7.5, weight, minutes)
+    def calories_cycling(self, weight_in_kg, elapsed_time_minutes):
+        return self._calculate_calories(CYCLING_MET, weight_in_kg, elapsed_time_minutes)
 
-    def _calculate_calories(self, met, weight, minutes):
-        hours = minutes / 60
-        return round(met * weight * hours, 1)
+    def _calculate_calories(self, met, weight_in_kg, elapsed_time_minutes):
+        hours = elapsed_time_minutes / 60
+        return round(met * weight_in_kg * hours, 1)
 
     def set_weekly_goal(self, week_start, distance_in_km):
         cursor = self.db.execute("INSERT INTO goal_types (name) VALUES (?)", ("weekly_distance",))
