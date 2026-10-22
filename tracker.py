@@ -25,16 +25,17 @@ class FitnessTracker:
         urllib.request.urlopen(SOCIAL_URL, data=post)
 
     def calories_running(self, weight, minutes):
-        hours = minutes / 60
-        return round(9.8 * weight * hours, 1)
+        return self._calculate_calories(9.8, weight, minutes)
 
     def calories_walking(self, weight, minutes):
-        hours = minutes / 60
-        return round(3.5 * weight * hours, 1)
+        return self._calculate_calories(3.5, weight, minutes)
 
     def calories_cycling(self, weight, minutes):
+        return self._calculate_calories(7.5, weight, minutes)
+
+    def _calculate_calories(self, met, weight, minutes):
         hours = minutes / 60
-        return round(7.5 * weight * hours, 1)
+        return round(met * weight * hours, 1)
 
     def set_weekly_goal(self, week_start, distance_in_km):
         cursor = self.db.execute("INSERT INTO goal_types (name) VALUES (?)", ("weekly_distance",))
